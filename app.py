@@ -1,6 +1,3 @@
-
-# https://www.geeksforgeeks.org/using-jwt-for-user-authentication-in-flask/
-
 # flask imports
 import os
 import json
@@ -75,10 +72,8 @@ def token_required(f):
             token = request.headers['x-access-token']
         # if token is not passed
         if not token:
-            return jsonify({'error_message': 'Token is missing !!'}), 422
-
+            return jsonify({'error_message': 'Access token is missing !!'}), 422
         try:
-            print(app.config['SECRET_KEY'], token)
             # decoding the payload to fetch the stored details
             data = jwt.decode(
                 token, key=app.config['SECRET_KEY'], algorithms=['HS256'])
@@ -86,9 +81,9 @@ def token_required(f):
                 .filter_by(public_id=data['public_id'])\
                 .first()
         except jwt.ExpiredSignatureError:
-            return jsonify({'error_message': 'Token is Expired !!'}), 408
+            return jsonify({'error_message': 'Access token is Expired !!'}), 408
         except:
-            return jsonify({'error_message': 'Token is Invalid !!'}), 406
+            return jsonify({'error_message': 'Access token is Invalid !!'}), 406
         # returns the current logged in users contex to the routes
         return f(current_user, *args, **kwargs)
 
@@ -100,11 +95,9 @@ def token_required(f):
 @app.route('/user', methods=['GET'])
 @token_required
 def get_all_users(current_user):
-    # querying the database
-    # for all the entries in it
+    # querying the database for all the entries in it
     users = User.query.all()
-    # converting the query objects
-    # to list of jsons
+    # converting the query objects to list of jsons
     output = []
     for user in users:
         # appending the user data json
@@ -141,11 +134,58 @@ def login():
             'public_id': user.public_id,
             'exp': datetime.utcnow() + timedelta(minutes=5)
         }
-        token = jwt.encode(
+        userrefreshtoken = {
+            'public_id': user.public_id,
+            'exp': datetime.utcnow() + timedelta(minutes=60)
+        }
+        access_token = jwt.encode(
             usertoken, key=app.config['SECRET_KEY'], algorithm='HS256')
-        return jsonify({'token': token}), 201
+        refresh_token = jwt.encode(
+            userrefreshtoken, key=app.config['SECRET_KEY'], algorithm='HS256')
+        return jsonify({'access_token': access_token, 'refresh_token': refresh_token}), 201
     # if password is wrong
     return jsonify({'error_message': 'password is wrong'}), 403
+
+
+# user logout
+@app.route('/refresh_token', methods=['GET'])
+def refresh_token():
+    # jwt is passed in the request header
+    if 'x-refresh-token' in request.headers:
+        refresh_token = request.headers['x-refresh-token']
+    if not refresh_token:
+        return jsonify({'error_message': 'Refresh token is missing !!'}), 422
+    try:
+        # decoding the payload to fetch the stored details
+        data = jwt.decode(
+            refresh_token, key=app.config['SECRET_KEY'], algorithms=['HS256'])
+        current_user = User.query\
+            .filter_by(public_id=data['public_id'])\
+            .first()
+
+        # generates the JWT Token
+        usertoken = {
+            'public_id': current_user.public_id,
+            'exp': datetime.utcnow() + timedelta(minutes=5)
+        }
+        access_token = jwt.encode(
+            usertoken, key=app.config['SECRET_KEY'], algorithm='HS256')
+        # Genrate new refresh_token only if it's expired within upcoming min 4000 sec
+        refresh_token_expired_min = data['exp'] - datetime.timestamp(datetime.utcnow())
+        if(refresh_token_expired_min < 4000):
+            userrefreshtoken = {
+                'public_id': current_user.public_id,
+                'exp': datetime.utcnow() + timedelta(minutes=60)
+            }
+            refresh_token = jwt.encode(
+                userrefreshtoken, key=app.config['SECRET_KEY'], algorithm='HS256')
+            return jsonify({'access_token': access_token, 'refresh_token': refresh_token}), 201
+        else:
+            return jsonify({'access_token': access_token, 'refresh_token': refresh_token}), 200
+    except jwt.ExpiredSignatureError:
+        return jsonify({'error_message': 'Refresh token is Expired !!'}), 408
+    except:
+        return jsonify({'error_message': 'Refresh token is Invalid !!'}), 406
 
 
 # signup route

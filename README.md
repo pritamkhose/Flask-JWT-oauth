@@ -35,6 +35,10 @@ You should be able to run this app on your own system via the familiar invocatio
 
 - [PyJWT](https://pypi.org/project/PyJWT/)
 
+- [Flask-JWT-Extended](https://flask-jwt-extended.readthedocs.io/en/stable/refreshing_tokens/) [PIP](https://pypi.org/project/Flask-JWT-Extended/)
+
+- [logot jwt](https://github.com/vimalloc/flask-jwt-extended/blob/master/examples/blocklist_database.py)
+
 - [Jwt.io](https://jwt.io/)
 
 - [Stackoverflow sqlalchemy](https://stackoverflow.com/questions/20744277/sqlalchemy-create-all-does-not-create-tables)
