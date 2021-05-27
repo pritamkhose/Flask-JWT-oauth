@@ -6,26 +6,38 @@
 	},
 	"item": [
 		{
-			"name": "http://localhost:5000/user",
+			"name": "http://localhost:5000/",
 			"request": {
 				"method": "GET",
-				"header": [
-					{
-						"key": "x-access-token",
-						"value": "0eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJwdWJsaWNfaWQiOiIwNDQzZjZiNi0zNTEzLTQ4OWItYWNjZi0yMDA0Y2VjZjE0YjUiLCJleHAiOjE2MjIwNTUwNzJ9.FBwIjUkZCWfsn0L6zhnHo0zSxf1D-4gKOg32wC7EeJ0",
-						"type": "text",
-						"equals": true
-					}
-				],
+				"header": [],
 				"url": {
-					"raw": "http://localhost:5000/user",
+					"raw": "http://localhost:5000/",
 					"protocol": "http",
 					"host": [
 						"localhost"
 					],
 					"port": "5000",
 					"path": [
-						"user"
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "http://localhost:5000/postman",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:5000/postman",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"postman"
 					]
 				}
 			},
@@ -41,7 +53,7 @@
 					"formdata": [
 						{
 							"key": "email",
-							"value": "pritam@gmail.com",
+							"value": "pritam1@gmail.com",
 							"type": "text"
 						},
 						{
@@ -110,19 +122,26 @@
 			"response": []
 		},
 		{
-			"name": "http://localhost:5000/",
+			"name": "http://localhost:5000/user",
 			"request": {
 				"method": "GET",
-				"header": [],
+				"header": [
+					{
+						"key": "x-access-token",
+						"value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJwdWJsaWNfaWQiOiJmYmIzYTA0MS05YjVjLTQ4YjMtODczNy0wNjA3OGFmZGIyY2UiLCJleHAiOjE2MjIxMDEzNTF9.oXfNKIPMAmaGiXXEWuqaIaF6loJJx8_jzJA-LZuCOGQ",
+						"type": "text",
+						"equals": true
+					}
+				],
 				"url": {
-					"raw": "http://localhost:5000/",
+					"raw": "http://localhost:5000/user",
 					"protocol": "http",
 					"host": [
 						"localhost"
 					],
 					"port": "5000",
 					"path": [
-						""
+						"user"
 					]
 				}
 			},

@@ -143,7 +143,7 @@ def login():
         }
         token = jwt.encode(
             usertoken, key=app.config['SECRET_KEY'], algorithm='HS256')
-        return jsonify(jsonify({'token': token}), 201)
+        return jsonify({'token': token}), 201
     # if password is wrong
     return jsonify({'error_message': 'password is wrong'}), 403
 
