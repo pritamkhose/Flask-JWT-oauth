@@ -47,6 +47,12 @@ class User(db.Model):
     password = db.Column(db.String(80))
 
 
+class SessionLogout(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    session_type = db.Column(db.String(20))
+    session_id = db.Column(db.String(255))
+
+
 createDatabase = False
 if not os.path.exists('Database.db'):
     print('Database not found')
@@ -66,27 +72,28 @@ if createDatabase:
 def token_required(f):
     @wraps(f)
     def decorated(*args, **kwargs):
-        token = None
-        # jwt is passed in the request header
-        if 'x-access-token' in request.headers:
-            token = request.headers['x-access-token']
-        # if token is not passed
-        if not token:
+        access_token = request.headers['x-access-token']
+        # if access token is not passed
+        if not access_token:
+            try:
+                # decoding the payload to fetch the stored details
+                data = jwt.decode(
+                    access_token, key=app.config['SECRET_KEY'], algorithms=['HS256'])
+                current_user = User.query\
+                    .filter_by(public_id=data['public_id'])\
+                    .first()
+                # # add access_token to blocklist if need or it will exipry after 5 min
+                # session = SessionLogout.query.filter_by(session_id=access_token).all()
+                # if session != None and len(session) > 0:
+                #     return jsonify({'error_message': 'you have been logout. Please login again!'}), 408
+                # returns the current logged in users contex to the routes
+                return f(current_user, *args, **kwargs)
+            except jwt.ExpiredSignatureError:
+                return jsonify({'error_message': 'Access token is Expired !!'}), 408
+            except:
+                return jsonify({'error_message': 'Access token is Invalid !!'}), 406
+        else:
             return jsonify({'error_message': 'Access token is missing !!'}), 422
-        try:
-            # decoding the payload to fetch the stored details
-            data = jwt.decode(
-                token, key=app.config['SECRET_KEY'], algorithms=['HS256'])
-            current_user = User.query\
-                .filter_by(public_id=data['public_id'])\
-                .first()
-        except jwt.ExpiredSignatureError:
-            return jsonify({'error_message': 'Access token is Expired !!'}), 408
-        except:
-            return jsonify({'error_message': 'Access token is Invalid !!'}), 406
-        # returns the current logged in users contex to the routes
-        return f(current_user, *args, **kwargs)
-
     return decorated
 
 
@@ -115,7 +122,7 @@ def get_all_users(current_user):
 @app.route('/login', methods=['POST'])
 def login():
     # creates dictionary of form data
-    auth = request.form
+    auth = request.json
     # if any email and password is missing
     if not auth or not auth.get('email') or not auth.get('password'):
         return jsonify({'error_message': 'email and password is missing.'}), 422
@@ -130,13 +137,16 @@ def login():
 
     if check_password_hash(user.password, auth.get('password')):
         # generates the JWT Token
+        iat = datetime.utcnow()
         usertoken = {
             'public_id': user.public_id,
-            'exp': datetime.utcnow() + timedelta(minutes=5)
+            'exp': iat + timedelta(minutes=5),
+            'iat': iat
         }
         userrefreshtoken = {
             'public_id': user.public_id,
-            'exp': datetime.utcnow() + timedelta(minutes=60)
+            'exp': iat + timedelta(minutes=60),
+            'iat': iat
         }
         access_token = jwt.encode(
             usertoken, key=app.config['SECRET_KEY'], algorithm='HS256')
@@ -147,80 +157,120 @@ def login():
     return jsonify({'error_message': 'password is wrong'}), 403
 
 
-# user logout
+# user refresh_token
 @app.route('/refresh_token', methods=['GET'])
 def refresh_token():
     # jwt is passed in the request header
-    if 'x-refresh-token' in request.headers:
-        refresh_token = request.headers['x-refresh-token']
-    if not refresh_token:
-        return jsonify({'error_message': 'Refresh token is missing !!'}), 422
-    try:
-        # decoding the payload to fetch the stored details
-        data = jwt.decode(
-            refresh_token, key=app.config['SECRET_KEY'], algorithms=['HS256'])
-        current_user = User.query\
-            .filter_by(public_id=data['public_id'])\
-            .first()
+    refresh_token = request.headers.get('x-refresh-token')
+    if refresh_token != None and refresh_token != '':
+        try:
+            # decoding the payload to fetch the stored details
+            data = jwt.decode(
+                refresh_token, key=app.config['SECRET_KEY'], algorithms=['HS256'])
+            # checking for existing session_id is logout
+            session = SessionLogout.query\
+                .filter_by(session_id=refresh_token).all()
+            # output = []
+            # for ses in session:
+            #     output.append({
+            #         'id': ses.id,
+            #         'session_type': ses.session_type,
+            #         'session_id': ses.session_id
+            #     })
+            if session != None and len(session) > 0:
+                # , 'session': output
+                return jsonify({'error_message': 'you have been logout. Please login again!'}), 408
+            else:
+                current_user = User.query\
+                    .filter_by(public_id=data['public_id'])\
+                    .first()
 
-        # generates the JWT Token
-        usertoken = {
-            'public_id': current_user.public_id,
-            'exp': datetime.utcnow() + timedelta(minutes=5)
-        }
-        access_token = jwt.encode(
-            usertoken, key=app.config['SECRET_KEY'], algorithm='HS256')
-        # Genrate new refresh_token only if it's expired within upcoming min 4000 sec
-        refresh_token_expired_min = data['exp'] - datetime.timestamp(datetime.utcnow())
-        if(refresh_token_expired_min < 4000):
-            userrefreshtoken = {
-                'public_id': current_user.public_id,
-                'exp': datetime.utcnow() + timedelta(minutes=60)
-            }
-            refresh_token = jwt.encode(
-                userrefreshtoken, key=app.config['SECRET_KEY'], algorithm='HS256')
-            return jsonify({'access_token': access_token, 'refresh_token': refresh_token}), 201
-        else:
-            return jsonify({'access_token': access_token, 'refresh_token': refresh_token}), 200
-    except jwt.ExpiredSignatureError:
-        return jsonify({'error_message': 'Refresh token is Expired !!'}), 408
-    except:
-        return jsonify({'error_message': 'Refresh token is Invalid !!'}), 406
+                # generates the JWT Token
+                iat = datetime.utcnow()
+                usertoken = {
+                    'public_id': current_user.public_id,
+                    'exp': iat + timedelta(minutes=5),
+                    'iat': iat
+                }
+                access_token = jwt.encode(
+                    usertoken, key=app.config['SECRET_KEY'], algorithm='HS256')
+                # Genrate new refresh_token only if it's expired within upcoming min 4000 sec
+                refresh_token_expired_min = data['exp'] - \
+                    datetime.timestamp(iat)
+                if(refresh_token_expired_min < 4000):
+                    userrefreshtoken = {
+                        'public_id': current_user.public_id,
+                        'exp': iat + timedelta(minutes=60),
+                        'iat': iat
+                    }
+                    refresh_token = jwt.encode(
+                        userrefreshtoken, key=app.config['SECRET_KEY'], algorithm='HS256')
+                    return jsonify({'access_token': access_token, 'refresh_token': refresh_token}), 201
+                else:
+                    return jsonify({'access_token': access_token, 'refresh_token': refresh_token}), 200
+        except jwt.ExpiredSignatureError:
+            return jsonify({'error_message': 'Refresh token is Expired !!'}), 408
+        except:
+            return jsonify({'error_message': 'Refresh token is Invalid !!'}), 406
+    else:
+        return jsonify({'error_message': 'Refresh token is missing !!'}), 422
+
+
+# Logout
+@app.route('/logout', methods=['GET'])
+def logout_token():
+    # jwt is passed in the request header
+    access_token = request.headers.get('x-access-token')
+    refresh_token = request.headers.get('x-refresh-token')
+    if access_token != None and access_token != '' and refresh_token != None and refresh_token != '':
+        try:
+            # insert session_id in block list
+            db.session.add(SessionLogout(
+                session_id=refresh_token, session_type='refresh_token'))
+            # add access_token to blocklist if need or it will exipry after 5 min
+            # db.session.add(SessionLogout(
+            #     session_id=access_token, session_type='access_token'))
+            db.session.commit()
+            return jsonify({'message': 'You have been logout!'}), 200
+        except Exception as e:
+            return jsonify({'error_message': str(e)}), 500
+    else:
+        return jsonify({'error_message': 'access and refresh token is missing !!'}), 422
 
 
 # signup route
 @app.route('/signup', methods=['POST'])
 def signup():
     # creates a dictionary of the form data
-    data = request.form
-    # if email, name and password is missing
-    if not data or not data.get('email') or not data.get('name') or not data.get('password'):
-        return jsonify({'error_message': 'email, name and password is missing.'}), 422
-
+    content = request.json
     # gets name, email and password
-    name, email = data.get('name'), data.get('email')
-    password = data.get('password')
+    name, email = content.get('name'), content.get('email')
+    password = content.get('password')
+    # if email, name and password is missing
+    if (content != None and content != '' and type(content) == dict and name != None and name != ''
+            and password != None and password != '' and email != None and email != ''):
+        # checking for existing user
+        user = User.query\
+            .filter_by(email=email)\
+            .first()
+        if not user:
+            # database ORM object
+            user = User(
+                public_id=str(uuid.uuid4()),
+                name=name,
+                email=email,
+                password=generate_password_hash(password)
+            )
+            # insert user
+            db.session.add(user)
+            db.session.commit()
 
-    # checking for existing user
-    user = User.query\
-        .filter_by(email=email)\
-        .first()
-    if not user:
-        # database ORM object
-        user = User(
-            public_id=str(uuid.uuid4()),
-            name=name,
-            email=email,
-            password=generate_password_hash(password)
-        )
-        # insert user
-        db.session.add(user)
-        db.session.commit()
-
-        return jsonify({'message': 'Successfully registered.'}), 201
+            return jsonify({'message': 'Successfully registered.'}), 201
+        else:
+            # returns 202 if user already exists
+            return jsonify({'message': 'User already exists. Please Log in.'}), 202
     else:
-        # returns 202 if user already exists
-        return jsonify({'message': 'User already exists. Please Log in.'}), 202
+        return jsonify({'error_message': 'email, name and password is missing.'}), 422
 
 
 # Home

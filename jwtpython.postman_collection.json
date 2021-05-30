@@ -49,19 +49,8 @@
 				"method": "POST",
 				"header": [],
 				"body": {
-					"mode": "formdata",
-					"formdata": [
-						{
-							"key": "email",
-							"value": "pritam1@gmail.com",
-							"type": "text"
-						},
-						{
-							"key": "password",
-							"value": "password",
-							"type": "text"
-						}
-					],
+					"mode": "raw",
+					"raw": "{\r\n    \"email\": \"pritam@gmail.com\",\r\n    \"password\": \"password\"\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -88,24 +77,13 @@
 				"method": "POST",
 				"header": [],
 				"body": {
-					"mode": "formdata",
-					"formdata": [
-						{
-							"key": "email",
-							"value": "pritam1@gmail.com",
-							"type": "text"
-						},
-						{
-							"key": "password",
-							"value": "password",
-							"type": "text"
-						},
-						{
-							"key": "name",
-							"value": "pritam",
-							"type": "text"
+					"mode": "raw",
+					"raw": "{\r\n    \"email\": \"pritam@gmail.com\",\r\n    \"password\": \"password\",\r\n    \"name\": \"pritam\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
 						}
-					]
+					}
 				},
 				"url": {
 					"raw": "http://localhost:5000/signup",
@@ -128,7 +106,7 @@
 				"header": [
 					{
 						"key": "x-access-token",
-						"value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJwdWJsaWNfaWQiOiJmYmIzYTA0MS05YjVjLTQ4YjMtODczNy0wNjA3OGFmZGIyY2UiLCJleHAiOjE2MjIxMTQxNTV9.LjxlFdQ6eWoeQO6Of4jKaHeGA0FCLO-WqDO5lV-Efzw",
+						"value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJwdWJsaWNfaWQiOiI1NTE1YjMyYS00MzZkLTQ0MGYtOGQ5MC03NDNhZjBhNTc0MDYiLCJleHAiOjE2MjIzNjUyNTMsImlhdCI6MTYyMjM2NDk1M30.uJRo-bH5CItrUCAdpkkGJRAAwNcopVrTWF59e6iXZ9c",
 						"type": "text",
 						"equals": true
 					}
@@ -154,7 +132,7 @@
 				"header": [
 					{
 						"key": "x-refresh-token",
-						"value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJwdWJsaWNfaWQiOiJmYmIzYTA0MS05YjVjLTQ4YjMtODczNy0wNjA3OGFmZGIyY2UiLCJleHAiOjE2MjIxMzU5ODN9.viQzL_Vfq8n2aWyTYAecJelUFF_NZSEcl-rUIlrquw0",
+						"value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJwdWJsaWNfaWQiOiIxYWYxZmQ1NC1hMGE4LTQzMWMtYTBkNi05NjMxYjZkNDk2ZWMiLCJleHAiOjE2MjIzNjc1NTIsImlhdCI6MTYyMjM2NzI1Mn0.t0vgK3sxWmVBiYhsh0NMlelkHHspmkZmRmvvFcLOnHk",
 						"type": "text"
 					}
 				],
@@ -167,6 +145,36 @@
 					"port": "5000",
 					"path": [
 						"refresh_token"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "http://localhost:5000/logout",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "x-refresh-token",
+						"value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJwdWJsaWNfaWQiOiIxYWYxZmQ1NC1hMGE4LTQzMWMtYTBkNi05NjMxYjZkNDk2ZWMiLCJleHAiOjE2MjIzNzA4NTIsImlhdCI6MTYyMjM2NzI1Mn0.tPljXbP31pnzcFQennPtBn41Qza1UGR3E0N67jq2AAA",
+						"type": "text"
+					},
+					{
+						"key": "x-access-token",
+						"value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJwdWJsaWNfaWQiOiIxYWYxZmQ1NC1hMGE4LTQzMWMtYTBkNi05NjMxYjZkNDk2ZWMiLCJleHAiOjE2MjIzNjc1NTIsImlhdCI6MTYyMjM2NzI1Mn0.t0vgK3sxWmVBiYhsh0NMlelkHHspmkZmRmvvFcLOnHk",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:5000/logout",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"logout"
 					]
 				}
 			},
