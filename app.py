@@ -72,9 +72,9 @@ if createDatabase:
 def token_required(f):
     @wraps(f)
     def decorated(*args, **kwargs):
-        access_token = request.headers['x-access-token']
+        access_token = request.headers.get('x-access-token')
         # if access token is not passed
-        if not access_token:
+        if access_token != None and access_token != '':
             try:
                 # decoding the payload to fetch the stored details
                 data = jwt.decode(
