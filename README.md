@@ -8,12 +8,16 @@ Secure a Flask REST API with JSON Web Token also deploy on heroku.
 python --version
 
 pip install -r requirements.txt
+or
+pip3 install -r requirements.txt  // for MAC
 ```
 
 # Run server
 
 ```sh
 python app.py
+or
+python3 app.py  // for MAC
 ```
 
 You should be able to run this app on your own system via the familiar invocation and visiting [http://localhost:5000](http://localhost:5000).

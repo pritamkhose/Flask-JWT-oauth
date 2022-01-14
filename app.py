@@ -224,14 +224,27 @@ def logout_token():
     refresh_token = request.headers.get('x-refresh-token')
     if access_token != None and access_token != '' and refresh_token != None and refresh_token != '':
         try:
-            # insert session_id in block list
-            db.session.add(SessionLogout(
-                session_id=refresh_token, session_type='refresh_token'))
-            # add access_token to blocklist if need or it will exipry after 5 min
-            # db.session.add(SessionLogout(
-            #     session_id=access_token, session_type='access_token'))
-            db.session.commit()
-            return jsonify({'message': 'You have been logout!'}), 200
+            # generates the JWT Token
+            iat = datetime.utcnow()
+            # decoding the payload to fetch the stored details
+            data = jwt.decode(
+                refresh_token, key=app.config['SECRET_KEY'], algorithms=['HS256'])
+            # Genrate new refresh_token only if it's expired within upcoming min 4000 sec
+            refresh_token_expired_min = data['exp'] - \
+                   datetime.timestamp(iat)
+            if(refresh_token_expired_min > 4000):
+                # insert session_id in block list
+                db.session.add(SessionLogout(
+                    session_id=refresh_token, session_type='refresh_token'))
+                # add access_token to blocklist if need or it will exipry after 5 min
+                # db.session.add(SessionLogout(
+                #     session_id=access_token, session_type='access_token'))
+                db.session.commit()
+                return jsonify({'message': 'You have been logout!', 'iat': iat}), 200
+            else :
+                return jsonify({'error_message': 'Refresh token is Expired !!', 'r': refresh_token_expired_min}), 408
+        except jwt.ExpiredSignatureError:
+            return jsonify({'error_message': 'Refresh token is Expired !!'}), 408
         except Exception as e:
             return jsonify({'error_message': str(e)}), 500
     else:

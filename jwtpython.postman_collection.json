@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "5eaa408e-2d30-466f-b8e6-82f64d923cf5",
+		"_postman_id": "dcd9d23d-9684-4e15-85cb-898ef64cf16e",
 		"name": "jwtpython",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -47,15 +47,15 @@
 			"name": "http://localhost:5000/login",
 			"request": {
 				"method": "POST",
-				"header": [],
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"email\": \"pritam@gmail.com\",\r\n    \"password\": \"password\"\r\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
+					"raw": "{\r\n    \"email\": \"pritam@gmail.com\",\r\n    \"password\": \"password\"\r\n}"
 				},
 				"url": {
 					"raw": "http://localhost:5000/login",
@@ -75,15 +75,15 @@
 			"name": "http://localhost:5000/signup",
 			"request": {
 				"method": "POST",
-				"header": [],
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"email\": \"pritam@gmail.com\",\r\n    \"password\": \"password\",\r\n    \"name\": \"pritam\"\r\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
+					"raw": "{\r\n    \"email\": \"pritam@gmail.com\",\r\n    \"password\": \"password\",\r\n    \"name\": \"pritam\"\r\n}"
 				},
 				"url": {
 					"raw": "http://localhost:5000/signup",
@@ -106,9 +106,7 @@
 				"header": [
 					{
 						"key": "x-access-token",
-						"value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJwdWJsaWNfaWQiOiI1NTE1YjMyYS00MzZkLTQ0MGYtOGQ5MC03NDNhZjBhNTc0MDYiLCJleHAiOjE2MjIzNjUyNTMsImlhdCI6MTYyMjM2NDk1M30.uJRo-bH5CItrUCAdpkkGJRAAwNcopVrTWF59e6iXZ9c",
-						"type": "text",
-						"equals": true
+						"value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJwdWJsaWNfaWQiOiI4ZDI5YWYzOS1iM2VlLTRkYmYtOGRiMS1jYzMxZTkyN2U3NTMiLCJleHAiOjE2NDIxODQ2ODUsImlhdCI6MTY0MjE4NDM4NX0.RpIwrh1-TFHP9XIjov2tkdbMqe9qTHb61aPkayoY13s"
 					}
 				],
 				"url": {
@@ -132,7 +130,7 @@
 				"header": [
 					{
 						"key": "x-refresh-token",
-						"value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJwdWJsaWNfaWQiOiIxYWYxZmQ1NC1hMGE4LTQzMWMtYTBkNi05NjMxYjZkNDk2ZWMiLCJleHAiOjE2MjIzNjc1NTIsImlhdCI6MTYyMjM2NzI1Mn0.t0vgK3sxWmVBiYhsh0NMlelkHHspmkZmRmvvFcLOnHk",
+						"value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJwdWJsaWNfaWQiOiI4ZDI5YWYzOS1iM2VlLTRkYmYtOGRiMS1jYzMxZTkyN2U3NTMiLCJleHAiOjE2NDIxODQ2ODUsImlhdCI6MTY0MjE4NDM4NX0.RpIwrh1-TFHP9XIjov2tkdbMqe9qTHb61aPkayoY13s",
 						"type": "text"
 					}
 				],
