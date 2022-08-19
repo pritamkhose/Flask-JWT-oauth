@@ -93,3 +93,9 @@ ENV/
 
 # Rope project settings
 .ropeproject
+
+
+# Postman newman
+node_modules/
+yarn.lock
+newman/

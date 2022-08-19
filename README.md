@@ -17,10 +17,17 @@ pip3 install -r requirements.txt  // for MAC
 ```sh
 python app.py
 or
-python3 app.py  // for MAC
+python3 app.py or nodemon app.py // for MAC
 ```
 
 You should be able to run this app on your own system via the familiar invocation and visiting [http://localhost:5000](http://localhost:5000).
+
+# Run Postman collection api testing
+
+```sh
+yarn install
+yarn test
+```
 
 ## Set env config variable
 

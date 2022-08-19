@@ -1,0 +1,21 @@
+{
+  "name": "jwtpython-postman-test",
+  "description": "This is app for api testing using",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "cleanNewman" : "rm -rf newman/ &&",
+    "test": "yarn cleanNewman newman run jwtpython.postman_collection.json --env-var baseURL=http://127.0.0.1:5000 -r html,json"
+  },
+  "keywords": [
+    "api",
+    "restfulapi",
+    "newman"
+  ],
+  "author": "Pritam Khose",
+  "devDependencies": {
+    "newman": "^5.3.2",
+    "newman-reporter-html": "^1.0.5",
+    "nodemon": "^2.0.19"
+  }
+}
